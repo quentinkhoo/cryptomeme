@@ -95,6 +95,15 @@ contract User {
         users[userIds[msg.sender]].state = userStates.admin;
     }
 
+    /**
+    * @dev Function to create a new user.
+    * @param _userWallet The address which owns the funds.
+    * @param _about A short paragraph which users can share abit more of themselves.
+    * @param _username The role of the user on the platform.
+    * @param _displayPictureHash Link to User's Profile picture.
+    * @param _displayName Name of user on the platform.
+    * @param _website website of user on the platform.
+    */
     function createUser(
         address _userWallet,
         string memory _username,
@@ -128,16 +137,31 @@ contract User {
         numberOfUsers = numberOfUsers.add(1);
     }
 
+    /**
+    * @dev Function to change Username (role).
+    * @param _userWallet The address which owns the funds.
+    * @param _username The new role of the user on the platform.
+    */
     function setUsername(address _userWallet, string memory _username) public {
         users[userIds[_userWallet]].username = _username;
         emit UsernameChanged(_userWallet, _username);
     }
 
+    /**
+    * @dev Function to change About.
+    * @param _userWallet The address which owns the funds.
+    * @param _about A new paragraph which users can share abit more of themselves.
+    */
     function setUserAbout(address _userWallet, string memory _about) public {
         users[userIds[_userWallet]].about = _about;
         emit UserAboutChanged(_userWallet, _about);
     }
 
+    /**
+    * @dev Function to change Display Picture.
+    * @param _userWallet The address which owns the funds.
+    * @param _displayPictureHash Link to User's New Profile picture.
+    */
     function setUserDisplayPicture(
         address _userWallet,
         string memory _displayPictureHash
@@ -146,6 +170,11 @@ contract User {
         emit UserDisplayPictureChanged(_userWallet, _displayPictureHash);
     }
 
+    /**
+    * @dev Function to change Display Name.
+    * @param _userWallet The address which owns the funds.
+    * @param _displayName New name of user on the platform.
+    */
     function setUserDisplayName(address _userWallet, string memory _displayName)
         public
     {
@@ -153,6 +182,11 @@ contract User {
         emit UserDisplayNameChanged(_userWallet, _displayName);
     }
 
+    /**
+    * @dev Function to change website.
+    * @param _userWallet The address which owns the funds.
+    * @param _website New website user on the platform.
+    */
     function setUserWebsite(address _userWallet, string memory _website)
         public
     {
@@ -160,16 +194,29 @@ contract User {
         emit UserWebsiteChanged(_userWallet, _website);
     }
 
+    /**
+    * @dev Deactivate a user from the platform
+    * @param _userWallet The address which owns the funds.
+    */
     function setUserAsDeactivated(address _userWallet) public {
         users[userIds[_userWallet]].state = userStates.deactivated;
         emit UserDeactivated(_userWallet);
     }
 
+    /**
+    * @dev Activate a user onto the platform
+    * @param _userWallet The address which owns the funds.
+    */
     function setUserAsActive(address _userWallet) public {
         users[userIds[_userWallet]].state = userStates.active;
         emit UserActivated(_userWallet);
     }
 
+    /**
+    * @dev Function to check if user had been created.
+    * @param _userWallet The address which owns the funds.
+    * @return A boolean indicating if an instance of the user exist on the system (active or deactive).
+    */
     function checkUserExists(address _userWallet) public view returns (bool) {
         return userExists[_userWallet];
     }
