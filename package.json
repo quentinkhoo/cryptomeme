@@ -25,12 +25,17 @@
     "@openzeppelin/contracts": "^2.5.0",
     "ganache-cli": "^6.9.1",
     "solidity-coverage": "^0.7.2",
-    "truffle": "^5.1.16"
+    "truffle": "^5.1.16",
+    "web3": "^1.2.6"
   },
   "author": "IS4302 - Teampepe69",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/teampepe69/cryptomeme/issues"
   },
-  "homepage": "https://github.com/teampepe69/cryptomeme#readme"
+  "homepage": "https://github.com/teampepe69/cryptomeme#readme",
+  "devDependencies": {
+    "bluebird": "^3.7.2",
+    "truffle-wallet-provider": "0.0.5"
+  }
 }

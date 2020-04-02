@@ -11,6 +11,8 @@ coverage.json
 
 # production
 /build
+/secrets.js
+/metamaskPass
 
 # misc
 .DS_Store
