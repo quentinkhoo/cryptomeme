@@ -26,7 +26,9 @@
     "ganache-cli": "^6.9.1",
     "solidity-coverage": "^0.7.2",
     "truffle": "^5.1.16",
-    "web3": "^1.2.6"
+    "truffle-hdwallet-provider": "^1.0.17",
+    "web3": "^1.2.6",
+    "windows-build-tools": "^5.2.2"
   },
   "author": "IS4302 - Teampepe69",
   "license": "ISC",
