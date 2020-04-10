@@ -77,7 +77,7 @@ const Register = (props) => {
     // once below code is okay, just copy these two line
     handleClose();
 
-    var userExists = await userNetwork.methods.checkUserExists(eWallet).call();
+    var userExists = await userNetwork.checkUserExists.call(eWallet);
 
     if (userExists) {
       Swal.fire({
@@ -86,7 +86,7 @@ const Register = (props) => {
         imageUrl: require("../../img/pleasebePatientPepe.png"),
       });
     } else {
-      memeketPlaceNetwork.methods
+      memeketPlaceNetwork
         .createUser(eWallet, about, displayPictureHash, displayName, website)
         .send({
           from: eWallet,

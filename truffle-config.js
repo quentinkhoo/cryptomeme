@@ -28,7 +28,7 @@ module.exports = {
     development: { host: "localhost", port: 8545, 
                    network_id: "*", gas: 4465030 },    
     ropsten: { provider: function() {
-      return new HDWalletProvider(mem,"https://ropsten.infura.io/v3/b83df1f175b14580b49eba109101107d")
+      return new HDWalletProvider(mem,"https://ropsten.infura.io/v3/16923192f0ca478ab86d2123538206bd")
     }, 
                    network_id: "3", gas: 4465030 }
   }

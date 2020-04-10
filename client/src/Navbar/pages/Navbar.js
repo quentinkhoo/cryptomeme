@@ -64,12 +64,12 @@ const Navbar = (props) => {
     var account = sessionStorage.getItem("account");
     console.log(account);
     if (userNetwork && account) {
-      var userId = await userNetwork.methods
-        .userIds(account)
-        .call({ from: account });
-      const user = await userNetwork.methods
-        .users(userId)
-        .call({ from: account });
+      var userId = await userNetwork
+        .userIds
+        .call(account,{ from: account });
+      const user = await userNetwork
+        .users
+        .call(userId,{ from: account });
       console.log(user.displayPictureHash);
       setUser(user);
       setDisplayName(user[4]);

@@ -61,19 +61,19 @@ const Login = (props) => {
     event.preventDefault();
     //Check user exists
 
-    let userExists = await userNetwork.methods
-      .checkUserExists(eWallet)
-      .call({ from: eWallet });
+    let userExists = await userNetwork
+      .checkUserExists
+      .call(eWallet,{ from: eWallet });
 
     if (userExists) {
       //Check user is activated
-      let userIsActivated = await userNetwork.methods
-        .checkUserIsActive(eWallet)
-        .call({ from: eWallet });
+      let userIsActivated = await userNetwork
+        .checkUserIsActive
+        .call(eWallet,{ from: eWallet });
       //Check user is admin
-      let userIsAdmin = await userNetwork.methods
-        .checkUserIsAdmin(eWallet)
-        .call({ from: eWallet });
+      let userIsAdmin = await userNetwork
+        .checkUserIsAdmin
+        .call(eWallet,{ from: eWallet });
       if (userIsActivated || userIsAdmin) {
         try {
           await web3.eth.personal.sign(

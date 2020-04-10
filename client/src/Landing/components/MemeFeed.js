@@ -171,9 +171,10 @@ const MemeFeed = (props) => {
     try {
       if (memeNetwork && memeketPlaceNetwork && userNetwork) {
         //Retrieve meme feed by calling memes function
-        const result = await memeNetwork.methods.numberOfMemes().call();
+        console.log(memeNetwork)
+        const result = await memeNetwork.getNumberMemes.call();
         for (var i = 0; i < result; i++) {
-          const meme = await memeNetwork.methods.memes(i).call();
+          const meme = await memeNetwork.memes.call(i);
           console.log(memeIsApproved(meme));
           if (memeIsApproved(meme)) {
             memeArray = memeArray.concat(meme);
@@ -183,12 +184,12 @@ const MemeFeed = (props) => {
 
             //retrieve the meme creator's address to get his userId
             const address = meme.memeOwner;
-            const userId = await userNetwork.methods.userIds(address).call();
+            const userId = await userNetwork.userIds.call(address);
 
             //retrieve meme creator object
-            const _memeOwner = await userNetwork.methods
-              .users(userId)
-              .call({ from: acc });
+            const _memeOwner = await userNetwork
+              .users
+              .call(userId,{ from: acc });
 
             _memeOwners = _memeOwners.concat(_memeOwner);
 
@@ -249,7 +250,7 @@ const MemeFeed = (props) => {
     const acc = sessionStorage.getItem("account");
     const memeDate = Math.floor(new Date().getTime() / 1000);
     try {
-      await memeketPlaceNetwork.methods
+      await memeketPlaceNetwork
         .uploadMeme(acc, memeDate, memePath, memeTitle, memeDescription)
         .send({
           from: acc,
@@ -303,9 +304,9 @@ const MemeFeed = (props) => {
     var arr = memes;
     // console.log(memeId);
     try {
-      await memeketPlaceNetwork.methods.likeMeme(memeId).send({ from: acc });
+      await memeketPlaceNetwork.likeMeme(memeId).send({ from: acc });
 
-      const updateMeme = await memeNetwork.methods.memes(memeId).call();
+      const updateMeme = await memeNetwork.memes.call(memeId);
 
       const state = arr.map((meme) => (meme[1] === memeId ? updateMeme : meme));
       await getStatus(memeId);
@@ -320,9 +321,9 @@ const MemeFeed = (props) => {
     const acc = sessionStorage.getItem("account");
     var arr = memes;
     try {
-      await memeketPlaceNetwork.methods.dislikeMeme(memeId).send({ from: acc });
+      await memeketPlaceNetwork.dislikeMeme(memeId).send({ from: acc });
 
-      const updateMeme = await memeNetwork.methods.memes(memeId).call();
+      const updateMeme = await memeNetwork.memes.call(memeId);
 
       const state = arr.map((meme) => (meme[1] === memeId ? updateMeme : meme));
       await getStatus(memeId);
@@ -339,7 +340,7 @@ const MemeFeed = (props) => {
     var ans;
     if (loggedIn) {
       const acc = sessionStorage.getItem("account");
-      ans = await memeketPlaceNetwork.methods.getLikes(memeId, acc).call();
+      ans = await memeketPlaceNetwork.getLikes.call(memeId, acc);
       status[memeId] = ans;
     }
 
@@ -352,11 +353,11 @@ const MemeFeed = (props) => {
     var arr = memes;
     // console.log(memeId);
     const isFlagged = await memeketPlaceNetwork.methods
-      .getFlags(memeId, acc)
-      .call();
+      .getFlags
+      .call(memeId, acc);
     if (!isFlagged) {
       try {
-        await memeketPlaceNetwork.methods.flagMeme(memeId).send({ from: acc });
+        await memeketPlaceNetwork.flagMeme(memeId).send({ from: acc });
         handleClose("flag");
         Swal.fire({
           title: "Flag successful!",
