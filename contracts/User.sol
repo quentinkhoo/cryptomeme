@@ -1,5 +1,4 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 import "../node_modules/@openzeppelin/contracts/math/SafeMath.sol";
 
 
@@ -52,7 +51,6 @@ contract User {
     struct user {
         uint256 userId;
         address userWallet;
-        string username;
         string about;
         string displayPictureHash;
         string displayName;
@@ -67,13 +65,11 @@ contract User {
     event UserCreated(
         uint256 userId,
         address userWallet,
-        string username,
         string about,
         string displayPictureHash,
         string displayName,
         string website
     );
-    event UsernameChanged(address userWallet, string username);
     event UserAboutChanged(address userWallet, string about);
     event UserDisplayPictureChanged(
         address userWallet,
@@ -84,12 +80,16 @@ contract User {
     event UserActivated(address userWallet);
     event UserDeactivated(address userWallet);
     event UserNewAdmin(address userWallet);
-    
+
+    modifier uniqueUser(address _userWallet) {
+        require(!userExists[_userWallet], "User already exists!");
+        _;
+    }
+
     constructor() public {
         //Create admin user
         createUser(
             msg.sender,
-            "administrator",
             "I am the boss",
             "QmP1KdPrFV9wKbDy5WvCDKd3YcyTBbFvqfvBCzjGrDiVLZ",
             "BigPepeBoss",
@@ -100,16 +100,14 @@ contract User {
 
     function createUser(
         address _userWallet,
-        string memory _username,
         string memory _about,
         string memory _displayPictureHash,
         string memory _displayName,
         string memory _website
-    ) public {
+    ) public uniqueUser(_userWallet) {
         user memory newUser = user(
             numberOfUsers,
             _userWallet,
-            _username,
             _about,
             _displayPictureHash,
             _displayName,
@@ -120,7 +118,6 @@ contract User {
         emit UserCreated(
             numberOfUsers,
             _userWallet,
-            _username,
             _about,
             _displayPictureHash,
             _displayName,
@@ -129,11 +126,6 @@ contract User {
         userExists[_userWallet] = true;
         userIds[_userWallet] = numberOfUsers;
         numberOfUsers = numberOfUsers.add(1);
-    }
-
-    function setUsername(address _userWallet, string memory _username) public {
-        users[userIds[_userWallet]].username = _username;
-        emit UsernameChanged(_userWallet, _username);
     }
 
     function setUserAbout(address _userWallet, string memory _about) public {
@@ -190,17 +182,20 @@ contract User {
         return users[userIds[_userWallet]].state == userStates.active;
     }
 
-    function getUser(uint256 i) public view returns(user memory) {
-        //require(i < numberOfUsers);
-        return users[i];
+    function checkUserIsPending(address _userWallet)
+        public
+        view
+        returns (bool)
+    {
+        return users[userIds[_userWallet]].state == userStates.pending;
     }
 
-    function getNumberUsers() public view returns(uint256) {
+    function getNumberUsers() public view returns (uint256) {
         //require(i < numberOfUsers);
         return numberOfUsers;
     }
 
-    function getUserAddress(uint256 i) public view returns(address) {
+    function getUserAddress(uint256 i) public view returns (address) {
         //require(i < numberOfUsers);
         return users[i].userWallet;
     }

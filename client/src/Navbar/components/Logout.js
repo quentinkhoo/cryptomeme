@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from 'react';
 import { Button, Modal, Card, TextField, CardMedia } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 
@@ -27,6 +27,7 @@ const styles = theme => ({
 const Logout = props => {
   const { classes } = props;
   const [open, setOpen] = React.useState(false);
+  
 
   const handleOpen = () => {
     setOpen(true);
@@ -36,12 +37,15 @@ const Logout = props => {
     setOpen(false);
   };
 
+
   function handleSubmit(event) {
     event.preventDefault();
     sessionStorage.removeItem("loggedIn");
     sessionStorage.removeItem("account");
     sessionStorage.removeItem("isAdmin");
-    window.location.reload();
+    handleClose();
+    window.location.replace("/");
+
   }
   return (
     <div>

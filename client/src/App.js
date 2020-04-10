@@ -1,8 +1,8 @@
 import React, { Component, setGlobal } from "reactn";
 import Swal from "sweetalert2";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import Meme from "./contracts/Meme.json";
 import User from "./contracts/User.json";
+import PepeCoin from "./contracts/PepeCoin.json";
 import MemeketPlace from "./contracts/MemeketPlace.json";
 import getWeb3 from "./getWeb3";
 import {
@@ -10,20 +10,35 @@ import {
   Switch,
   Route,
   Link,
-  NavLink
+  NavLink,
+  Redirect,
+  useHistory,
+  useLocation,
 } from "react-router-dom";
 import LandingPage from "./Landing/pages/LandingPage.js";
 import ProfilePage from "./Profile/pages/Profile.js";
 import Navbar from "./Navbar/pages/Navbar.js";
 import AdminPage from "./Admin/pages/Admin.js";
+import LeaderBoardPage from "./LeaderBoard/pages/LeaderBoard.js";
 import SideDrawer from "./Subbar/components/SideDrawer";
 
 setGlobal({
   web3: null,
   userNetwork: null,
   memeNetwork: null,
-  memeketPlaceNetwork: null
+  memeketPlaceNetwork: null,
 });
+
+const isLoggedIn = JSON.parse(sessionStorage.getItem("loggedIn"));
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest}
+    render={(props) =>
+      isLoggedIn === true ? <Component {...props} /> : <Redirect to="/" />
+    }
+  />
+);
 
 class App extends Component {
   constructor(props) {
@@ -33,9 +48,10 @@ class App extends Component {
       web3: null,
       account: "",
       memeketPlaceNetwork: null,
+      pepeCoinNetwork: null,
       deployedMemeketPlaceNetworkData: null,
       memeNetwork: null,
-      userNetwork: null
+      userNetwork: null,
     };
   }
 
@@ -50,7 +66,6 @@ class App extends Component {
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
       this.setState({ account: accounts[0] });
-      //this.setState({ account: "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1" });
 
       // Get the Contract instances.
       const networkId = await web3.eth.net.getId();
@@ -64,9 +79,7 @@ class App extends Component {
           Meme.abi,
           deployedMemeNetworkData.address
         );
-        this.setState({ memeNetwork: memeNetwork });
         this.setGlobal({ memeNetwork: memeNetwork });
-        //this.setGlobal(memeNetwork => memeNetwork);
       }
 
       // Get User instance and all the Memes
@@ -77,8 +90,19 @@ class App extends Component {
           User.abi,
           deployedUserNetworkData.address
         );
-        this.setState({ userNetwork: userNetwork });
         this.setGlobal({ userNetwork: userNetwork });
+        //this.setGlobal(userNetwork => userNetwork);
+      }
+
+      // Get PepeCoin instance and all the Memes
+      const deployedPepeCoinNetworkData = PepeCoin.networks[networkId];
+
+      if (deployedPepeCoinNetworkData) {
+        const pepeCoinNetwork = new web3.eth.Contract(
+          PepeCoin.abi,
+          deployedPepeCoinNetworkData.address
+        );
+        this.setGlobal({ pepeCoinNetwork: pepeCoinNetwork });
         //this.setGlobal(userNetwork => userNetwork);
       }
 
@@ -89,10 +113,6 @@ class App extends Component {
           MemeketPlace.abi,
           deployedMemeketPlaceNetworkData.address
         );
-        this.setState({ memeketPlaceNetwork: memeketPlaceNetwork });
-        this.setState({
-          deployedMemeketPlaceNetworkData: deployedMemeketPlaceNetworkData
-        });
         this.setGlobal({ memeketPlaceNetwork: memeketPlaceNetwork });
         //this.setGlobal(memeketPlaceNetwork => memeketPlaceNetwork);
       }
@@ -115,20 +135,11 @@ class App extends Component {
         style={{
           backgroundColor: "#9acdbaff",
           height: "100%",
-          minHeight: "100vh"
+          minHeight: "100vh",
         }}
       >
         <Router>
-          <Navbar
-            web3={this.state.web3}
-            account={this.state.account}
-            deployedMemeketPlaceNetworkData={
-              this.state.deployedMemeketPlaceNetworkData
-            }
-            memeNetwork={this.state.memeNetwork}
-            userNetwork={this.state.userNetwork}
-            memeketPlaceNetwork={this.state.memeketPlaceNetwork}
-          />
+          <Navbar />
           <div style={{ paddingTop: "100px" }}>
             <div style={{ paddingLeft: "20px", width: "120px" }}>
               <SideDrawer />
@@ -137,18 +148,15 @@ class App extends Component {
               <Route
                 exact
                 path="/"
-                render={routeProps => (
-                  <LandingPage
-                    {...routeProps}
-                    account={this.state.account}
-                    memeNetwork={this.state.memeNetwork}
-                    userNetwork={this.state.userNetwork}
-                    memeketPlaceNetwork={this.state.memeketPlaceNetwork}
-                  />
-                )}
+                render={(routeProps) => <LandingPage {...routeProps} />}
               />
-              <Route exact path="/profile" component={ProfilePage} />
-              <Route exact path="/admin" component={AdminPage} />
+              <PrivateRoute
+                exact
+                path="/leaderBoard"
+                component={LeaderBoardPage}
+              />
+              <PrivateRoute exact path="/profile" component={ProfilePage} />
+              <PrivateRoute exact path="/admin" component={AdminPage} />
             </div>
           </div>
         </Router>

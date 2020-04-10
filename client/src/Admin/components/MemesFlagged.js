@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import { withStyles } from "@material-ui/core/styles";
-import EditUser from "../components/EditUser";
+import EditMemes from "./EditMemes";
 
 const styles = (theme) => ({
   table: {
@@ -31,20 +31,28 @@ const styles = (theme) => ({
 
 const columnData = [
   {
-    id: "uid",
-    label: "UID",
+    id: "MemeId",
+    label: "Meme Id",
   },
   {
-    id: "displayName",
-    label: "Display Name",
+    id: "memeTitle",
+    label: "Meme Title",
   },
   {
-    id: "userWallet",
-    label: "User Wallet",
+    id: "memeOwner",
+    label: "Meme Author",
   },
   {
-    id: "state",
-    label: "Status",
+    id: "memePath",
+    label: "Meme Path",
+  },
+  {
+    id: "memeFlags",
+    label: "Meme Flag Number",
+  },
+  {
+    id: "memeState",
+    label: "Meme Status",
   },
 ];
 
@@ -74,8 +82,8 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-const Users = (props) => {
-  const { value, index, peopleParent, classes, ...other } = props;
+const MemesFlagged = (props) => {
+  const { value, index, peopleParent, stopFlags, classes, ...other } = props;
   const [rows, setRows] = React.useState([]);
   const [people, setPeople] = React.useState(peopleParent);
   const [disobedientRows, setDisobedientRows] = React.useState([]);
@@ -84,13 +92,9 @@ const Users = (props) => {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [open, setOpen] = React.useState(false);
-  const [selectedUser, setUser] = React.useState({
-    uid: 69,
-    displayName: "test",
-    userWallet: "my",
-    state: "code",
-  });
+  const [selectedMeme, setMeme] = React.useState([]);
   const [userNetwork] = useGlobal("userNetwork");
+  const [memeNetwork] = useGlobal("memeNetwork");
   const [pepeCoinNetwork] = useGlobal("pepeCoinNetwork");
   const [web3] = useGlobal("web3");
 
@@ -113,82 +117,102 @@ const Users = (props) => {
     handleRequestSort(event, property);
   };
 
-  const openModal = (user) => {
-    const targetUser = {
-      uid: user.uid,
-      displayName: user.displayName,
-      userWallet: user.userWallet,
-      state: user.state,
+  const openModal = (meme) => {
+    const targetMeme = {
+      memeId: meme.memeId,
+      memeTitle: meme.memeTitle,
+      memeOwner: meme.memeOwner,
+      memePath: meme.memePath,
+      memeFlags: meme.memeFlags,
+      memeStatus: meme.memeStatus,
     };
-    setUser(targetUser);
+    setMeme(targetMeme);
     setOpen(true);
   };
 
   async function closeModal() {
-    // When we close a modal -> Check for fetching data in case of change
-    await fetchData();
+    console.log("Meme Should be close");
+    await fetchMemes();
     setOpen(false);
+    // When we close a modal -> Check for fetching data in case of change
   }
 
-  async function mapStatus(statusInt) {
-    if (statusInt == 0) {
-      return "Pending";
-    } else if (statusInt == 1) {
-      return "Active";
-    } else if (statusInt == 2) {
-      return "Deactivated";
-    } else if (statusInt == 3) {
-      return "Admin";
-    }
-  }
-
-  // Function to fetch data when only User state change
-  async function fetchData() {
+  // Function for populate data : it's called to modify rows / disobidentrows states
+  async function fetchMemes() {
     // fetch the data from contracts to have current users status
-    const resObedients = [];
-    const resDisobedients = [];
-    let elemStatus = "";
-    async function fetchDataInside(resObedients, resDisobedients) {
+    const resMemesFlagged = [];
+    const resMemesDisobediend = [];
+    const resMemesApproved = [];
+    async function fetchDataMemeInside(
+      resMemesFlagged,
+      resMemesDisobediend,
+      resMemesApproved
+    ) {
       // Use try / catch to prevent error when network is not loaded (when you go directly to admin page in dev mode) -> Thus global constatns are not set
 
       try {
         // Check networks are up to date
-        console.log("this is userNetwork: ", value);
-        console.log("this is web3: ", web3);
+        console.log("Fetch Meme,this is memeNetwork: ", memeNetwork);
+        console.log("Fetch Meme,this is web3: ", web3);
 
         // Get number of accounts to iter on it (could be improve but impossible to return array from solidity)
         const result = await web3.eth.getAccounts();
-        const numOfElements = await userNetwork.methods
-          .getNumberUsers()
+        const numOfElements = await memeNetwork.methods
+          .getNumberMemes()
           .call({ from: result[0] });
+        console.log("Number of memes:", numOfElements);
+        // Set Rows empty
+        //setRows([]);
+        //setDisobedientRows([]);
 
         // Maybe there is a proper way however i do not find how to return dynamic array in solidity
         for (let i = 0; i < numOfElements; i++) {
           // Current user
-          const elem = await userNetwork.methods
-            .users(i)
+          const elem = await memeNetwork.methods
+            .memes(i)
             .call({ from: result[0] });
-          // If user is disobedient : bad guy
-          if (elem.state == 2) {
-            elemStatus = await mapStatus(elem.state);
-            resDisobedients.push(
-              createData(
-                elem.userId,
-                elem.displayName,
-                elem.userWallet,
-                elemStatus
+          console.log("This is a meme:", elem);
+
+          // If pending or if approved and memeFlags > 0
+          if (
+            (elem.memeState == 2) |
+            ((elem.memeState == 0) & (elem.memeFlags > 0))
+          ) {
+            console.log("meme should be rejected / approved", elem);
+            resMemesFlagged.push(
+              createDataMeme(
+                elem.memeId,
+                elem.memeTitle,
+                elem.memeOwner,
+                elem.memePath,
+                elem.memeFlags,
+                mapStatusMeme(elem.memeState)
               )
             );
           }
-          // If user is clean : good guy
-          else {
-            elemStatus = await mapStatus(elem.state);
-            resObedients.push(
-              createData(
-                elem.userId,
-                elem.displayName,
-                elem.userWallet,
-                elemStatus
+          // If meme is rejected
+          else if (elem.memeState == 1) {
+            console.log("meme is already rejected", elem);
+            resMemesDisobediend.push(
+              createDataMeme(
+                elem.memeId,
+                elem.memeTitle,
+                elem.memeOwner,
+                elem.memePath,
+                elem.memeFlags,
+                mapStatusMeme(elem.memeState)
+              )
+            );
+          } else {
+            console.log("meme is approved", elem);
+            resMemesApproved.push(
+              createDataMeme(
+                elem.memeId,
+                elem.memeTitle,
+                elem.memeOwner,
+                elem.memePath,
+                elem.memeFlags,
+                mapStatusMeme(elem.memeState)
               )
             );
           }
@@ -199,12 +223,27 @@ const Users = (props) => {
     }
 
     // Do something with the results : await for fetch and update state
-    await fetchDataInside(resObedients, resDisobedients);
+    await fetchDataMemeInside(
+      resMemesFlagged,
+      resMemesDisobediend,
+      resMemesApproved
+    );
+    if (index == 2) {
+      setPeople(resMemesFlagged);
+    } else if (index == 3) {
+      setPeople(resMemesDisobediend);
+    } else if (index == 4) {
+      setPeople(resMemesApproved);
+    }
+  }
 
-    if (index === 0) {
-      setPeople(resObedients);
-    } else if (index === 1) {
-      setPeople(resDisobedients);
+  function mapStatusMeme(statusInt) {
+    if (statusInt == 0) {
+      return "Approved";
+    } else if (statusInt == 1) {
+      return "Rejected";
+    } else if (statusInt == 2) {
+      return "Pending";
     }
   }
 
@@ -216,8 +255,15 @@ const Users = (props) => {
     );
   }, [peopleParent]);
 
-  function createData(uid, displayName, userWallet, state) {
-    return { uid, displayName, userWallet, state };
+  function createDataMeme(
+    memeId,
+    memeTitle,
+    memeOwner,
+    memePath,
+    memeFlags,
+    memeStatus
+  ) {
+    return { memeId, memeTitle, memeOwner, memePath, memeFlags, memeStatus };
   }
 
   const emptyRows =
@@ -269,10 +315,12 @@ const Users = (props) => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((n) => (
                   <TableRow hover tabIndex={0} key={n.uid}>
-                    <TableCell>{n.uid}</TableCell>
-                    <TableCell>{n.displayName}</TableCell>
-                    <TableCell>{n.userWallet}</TableCell>
-                    <TableCell>{n.state}</TableCell>
+                    <TableCell>{n.memeId}</TableCell>
+                    <TableCell>{n.memeTitle}</TableCell>
+                    <TableCell>{n.memeOwner}</TableCell>
+                    <TableCell>{n.memePath}</TableCell>
+                    <TableCell>{n.memeFlags}</TableCell>
+                    <TableCell>{n.memeStatus}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="delete"
@@ -304,10 +352,11 @@ const Users = (props) => {
             onChangePage={handleChangePage}
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
-          <EditUser
+          <EditMemes
             modalState={open}
             handleClose={closeModal}
-            userInfo={selectedUser}
+            memeInfo={selectedMeme}
+            stopFlags={stopFlags}
           />
         </div>
       )}
@@ -315,4 +364,4 @@ const Users = (props) => {
   );
 };
 
-export default withStyles(styles, { withTheme: true })(Users);
+export default withStyles(styles, { withTheme: true })(MemesFlagged);

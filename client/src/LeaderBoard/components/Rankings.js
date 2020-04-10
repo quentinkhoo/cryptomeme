@@ -18,7 +18,6 @@ import {
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import { withStyles } from "@material-ui/core/styles";
-import EditUser from "../components/EditUser";
 
 const styles = (theme) => ({
   table: {
@@ -31,20 +30,16 @@ const styles = (theme) => ({
 
 const columnData = [
   {
+    id: "pepeCoins",
+    label: "PepeCoins number",
+  },
+  {
     id: "uid",
-    label: "UID",
+    label: "User Id",
   },
   {
     id: "displayName",
     label: "Display Name",
-  },
-  {
-    id: "userWallet",
-    label: "User Wallet",
-  },
-  {
-    id: "state",
-    label: "Status",
   },
 ];
 
@@ -74,25 +69,14 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-const Users = (props) => {
-  const { value, index, peopleParent, classes, ...other } = props;
-  const [rows, setRows] = React.useState([]);
+const Rankings = (props) => {
+  const { value, index, peopleParent, stopFlags, classes, ...other } = props;
   const [people, setPeople] = React.useState(peopleParent);
-  const [disobedientRows, setDisobedientRows] = React.useState([]);
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
-  const [open, setOpen] = React.useState(false);
-  const [selectedUser, setUser] = React.useState({
-    uid: 69,
-    displayName: "test",
-    userWallet: "my",
-    state: "code",
-  });
-  const [userNetwork] = useGlobal("userNetwork");
-  const [pepeCoinNetwork] = useGlobal("pepeCoinNetwork");
-  const [web3] = useGlobal("web3");
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -113,115 +97,18 @@ const Users = (props) => {
     handleRequestSort(event, property);
   };
 
-  const openModal = (user) => {
-    const targetUser = {
-      uid: user.uid,
-      displayName: user.displayName,
-      userWallet: user.userWallet,
-      state: user.state,
-    };
-    setUser(targetUser);
-    setOpen(true);
-  };
-
-  async function closeModal() {
-    // When we close a modal -> Check for fetching data in case of change
-    await fetchData();
-    setOpen(false);
-  }
-
-  async function mapStatus(statusInt) {
-    if (statusInt == 0) {
-      return "Pending";
-    } else if (statusInt == 1) {
-      return "Active";
-    } else if (statusInt == 2) {
-      return "Deactivated";
-    } else if (statusInt == 3) {
-      return "Admin";
-    }
-  }
-
-  // Function to fetch data when only User state change
-  async function fetchData() {
-    // fetch the data from contracts to have current users status
-    const resObedients = [];
-    const resDisobedients = [];
-    let elemStatus = "";
-    async function fetchDataInside(resObedients, resDisobedients) {
-      // Use try / catch to prevent error when network is not loaded (when you go directly to admin page in dev mode) -> Thus global constatns are not set
-
-      try {
-        // Check networks are up to date
-        console.log("this is userNetwork: ", value);
-        console.log("this is web3: ", web3);
-
-        // Get number of accounts to iter on it (could be improve but impossible to return array from solidity)
-        const result = await web3.eth.getAccounts();
-        const numOfElements = await userNetwork.methods
-          .getNumberUsers()
-          .call({ from: result[0] });
-
-        // Maybe there is a proper way however i do not find how to return dynamic array in solidity
-        for (let i = 0; i < numOfElements; i++) {
-          // Current user
-          const elem = await userNetwork.methods
-            .users(i)
-            .call({ from: result[0] });
-          // If user is disobedient : bad guy
-          if (elem.state == 2) {
-            elemStatus = await mapStatus(elem.state);
-            resDisobedients.push(
-              createData(
-                elem.userId,
-                elem.displayName,
-                elem.userWallet,
-                elemStatus
-              )
-            );
-          }
-          // If user is clean : good guy
-          else {
-            elemStatus = await mapStatus(elem.state);
-            resObedients.push(
-              createData(
-                elem.userId,
-                elem.displayName,
-                elem.userWallet,
-                elemStatus
-              )
-            );
-          }
-        }
-      } catch (e) {
-        console.log("Error in the process");
-      }
-    }
-
-    // Do something with the results : await for fetch and update state
-    await fetchDataInside(resObedients, resDisobedients);
-
-    if (index === 0) {
-      setPeople(resObedients);
-    } else if (index === 1) {
-      setPeople(resDisobedients);
-    }
-  }
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, people.length - page * rowsPerPage);
 
   useEffect(() => {
-    setPeople(peopleParent);
+    setPeople(
+      peopleParent.sort((a, b) => (a.pepeCoins < b.pepeCoins ? 1 : -1))
+    );
     console.log(
       "People parent have change -> We update people for printing",
       peopleParent
     );
   }, [peopleParent]);
-
-  function createData(uid, displayName, userWallet, state) {
-    return { uid, displayName, userWallet, state };
-  }
-
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, people.length - page * rowsPerPage);
 
   return (
     <Typography
@@ -261,26 +148,16 @@ const Users = (props) => {
                   ),
                   this
                 )}
-                <TableCell>Edit</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {stableSort(people, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((n) => (
-                  <TableRow hover tabIndex={0} key={n.uid}>
+                  <TableRow hover tabIndex={0} key={n.rk}>
+                    <TableCell>{n.pepeCoins}</TableCell>
                     <TableCell>{n.uid}</TableCell>
                     <TableCell>{n.displayName}</TableCell>
-                    <TableCell>{n.userWallet}</TableCell>
-                    <TableCell>{n.state}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => openModal(n)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </TableCell>
                   </TableRow>
                 ))}
               {emptyRows > 0 && (
@@ -304,15 +181,10 @@ const Users = (props) => {
             onChangePage={handleChangePage}
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
-          <EditUser
-            modalState={open}
-            handleClose={closeModal}
-            userInfo={selectedUser}
-          />
         </div>
       )}
     </Typography>
   );
 };
 
-export default withStyles(styles, { withTheme: true })(Users);
+export default withStyles(styles, { withTheme: true })(Rankings);
