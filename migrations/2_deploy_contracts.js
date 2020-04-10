@@ -5,7 +5,7 @@ var MemeketPlace = artifacts.require("./MemeketPlace.sol");
 
 module.exports = async function(deployer, network, accounts) {
 
-  let deployAddress = "0x47568DA4087A29F6863ba3Df2d4Bd898D8670678"; // by convention
+  let deployAddress = accounts[0]; // by convention
 
   if( network == "mainnet" ) {            
     throw "Halt. Sanity check. Not ready for deployment to mainnet. Manually remove this throw and try again.";
