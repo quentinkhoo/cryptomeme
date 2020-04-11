@@ -5,7 +5,6 @@ import User from "./contracts/User.json";
 import PepeCoin from "./contracts/PepeCoin.json";
 import MemeketPlace from "./contracts/MemeketPlace.json";
 import getWeb3 from "./getWeb3";
-import contract from "@truffle/contract";
 import {
   BrowserRouter as Router,
   Switch,
@@ -73,37 +72,50 @@ class App extends Component {
       // const networkId = localStorage.getItem("networkId")
 
       // Get Meme instance and all the Memes
-      const memeNetwork = contract(Meme);
-      memeNetwork.setProvider(this.state.web3.currentProvider);
-      memeNetwork.deployed().then((instance1) => {
-        this.setGlobal({ memeNetwork: instance1 });
-        console.log(instance1);
-      });
+      const deployedMemeNetworkData = Meme.networks[networkId];
+
+      if (deployedMemeNetworkData) {
+        const memeNetwork = new web3.eth.Contract(
+          Meme.abi,
+          deployedMemeNetworkData.address
+        );
+        this.setGlobal({ memeNetwork: memeNetwork });
+      }
 
       // Get User instance and all the Memes
-      const userNetwork = contract(User);
-      userNetwork.setProvider(this.state.web3.currentProvider);
-      userNetwork.deployed().then((instance2) => {
-        this.setGlobal({ userNetwork: instance2 });
-        console.log(instance2);
-      });
-      //this.setGlobal(userNetwork => userNetwork);
+      const deployedUserNetworkData = User.networks[networkId];
+
+      if (deployedUserNetworkData) {
+        const userNetwork = new web3.eth.Contract(
+          User.abi,
+          deployedUserNetworkData.address
+        );
+        this.setGlobal({ userNetwork: userNetwork });
+        //this.setGlobal(userNetwork => userNetwork);
+      }
 
       // Get PepeCoin instance and all the Memes
-      const pepeCoinNetwork = contract(PepeCoin);
-      pepeCoinNetwork.setProvider(this.state.web3.currentProvider);
-      pepeCoinNetwork.deployed().then((instance3) => {
-        this.setGlobal({ pepeCoinNetwork: instance3 });
-        console.log(instance3);
-      });
+      const deployedPepeCoinNetworkData = PepeCoin.networks[networkId];
+
+      if (deployedPepeCoinNetworkData) {
+        const pepeCoinNetwork = new web3.eth.Contract(
+          PepeCoin.abi,
+          deployedPepeCoinNetworkData.address
+        );
+        this.setGlobal({ pepeCoinNetwork: pepeCoinNetwork });
+        //this.setGlobal(userNetwork => userNetwork);
+      }
 
       //Get Memeketplace instance
-      const memeketPlaceNetwork = contract(MemeketPlace);
-      memeketPlaceNetwork.setProvider(this.state.web3.currentProvider);
-      memeketPlaceNetwork.deployed().then((instance4) => {
-        this.setGlobal({ memeketPlaceNetwork: instance4 });
-        console.log(instance4);
-      });
+      const deployedMemeketPlaceNetworkData = MemeketPlace.networks[networkId];
+      if (deployedMemeketPlaceNetworkData) {
+        const memeketPlaceNetwork = new web3.eth.Contract(
+          MemeketPlace.abi,
+          deployedMemeketPlaceNetworkData.address
+        );
+        this.setGlobal({ memeketPlaceNetwork: memeketPlaceNetwork });
+        //this.setGlobal(memeketPlaceNetwork => memeketPlaceNetwork);
+      }
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
