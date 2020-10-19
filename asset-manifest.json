@@ -1,0 +1,43 @@
+{
+  "files": {
+    "main.css": "/cryptomeme/static/css/main.93a4bcea.chunk.css",
+    "main.js": "/cryptomeme/static/js/main.f20e60e6.chunk.js",
+    "main.js.map": "/cryptomeme/static/js/main.f20e60e6.chunk.js.map",
+    "runtime-main.js": "/cryptomeme/static/js/runtime-main.89bed9f2.js",
+    "runtime-main.js.map": "/cryptomeme/static/js/runtime-main.89bed9f2.js.map",
+    "static/css/2.89f067aa.chunk.css": "/cryptomeme/static/css/2.89f067aa.chunk.css",
+    "static/js/2.579aad84.chunk.js": "/cryptomeme/static/js/2.579aad84.chunk.js",
+    "static/js/2.579aad84.chunk.js.map": "/cryptomeme/static/js/2.579aad84.chunk.js.map",
+    "index.html": "/cryptomeme/index.html",
+    "precache-manifest.d6954f9fa2188198e6ea9cd54aadbd44.js": "/cryptomeme/precache-manifest.d6954f9fa2188198e6ea9cd54aadbd44.js",
+    "service-worker.js": "/cryptomeme/service-worker.js",
+    "static/css/2.89f067aa.chunk.css.map": "/cryptomeme/static/css/2.89f067aa.chunk.css.map",
+    "static/css/main.93a4bcea.chunk.css.map": "/cryptomeme/static/css/main.93a4bcea.chunk.css.map",
+    "static/js/2.579aad84.chunk.js.LICENSE.txt": "/cryptomeme/static/js/2.579aad84.chunk.js.LICENSE.txt",
+    "static/media/ClownPepe.png": "/cryptomeme/static/media/ClownPepe.0fc2ce1b.png",
+    "static/media/HappyPepe.png": "/cryptomeme/static/media/HappyPepe.e447b48a.png",
+    "static/media/Let_Me_In.jpg": "/cryptomeme/static/media/Let_Me_In.56ab55ba.jpg",
+    "static/media/adminpepe.png": "/cryptomeme/static/media/adminpepe.84cc70e1.png",
+    "static/media/angryPepe.png": "/cryptomeme/static/media/angryPepe.bd3d0b76.png",
+    "static/media/byepepe.png": "/cryptomeme/static/media/byepepe.8a86893c.png",
+    "static/media/deactivatepepe.png": "/cryptomeme/static/media/deactivatepepe.89a49d7b.png",
+    "static/media/detectivePikachu.jpg": "/cryptomeme/static/media/detectivePikachu.9328850d.jpg",
+    "static/media/fatPepe.png": "/cryptomeme/static/media/fatPepe.143344b5.png",
+    "static/media/jesuspepe.png": "/cryptomeme/static/media/jesuspepe.3113d918.png",
+    "static/media/joinpepe.png": "/cryptomeme/static/media/joinpepe.ad977d5c.png",
+    "static/media/loginpepe.png": "/cryptomeme/static/media/loginpepe.94658236.png",
+    "static/media/lovePepe.png": "/cryptomeme/static/media/lovePepe.1e209450.png",
+    "static/media/makeAdmin.png": "/cryptomeme/static/media/makeAdmin.01757486.png",
+    "static/media/peperoni.png": "/cryptomeme/static/media/peperoni.b3a753e0.png",
+    "static/media/pleasebePatientPepe.png": "/cryptomeme/static/media/pleasebePatientPepe.0ff16218.png",
+    "static/media/sadpepe.png": "/cryptomeme/static/media/sadpepe.ba54aca2.png",
+    "static/media/yayPepe.png": "/cryptomeme/static/media/yayPepe.970aa156.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.89bed9f2.js",
+    "static/css/2.89f067aa.chunk.css",
+    "static/js/2.579aad84.chunk.js",
+    "static/css/main.93a4bcea.chunk.css",
+    "static/js/main.f20e60e6.chunk.js"
+  ]
+}
